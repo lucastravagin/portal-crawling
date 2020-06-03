@@ -49,14 +49,21 @@ let scrape = async (url) => {
             registros.nome_fantasia = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(3) > div:nth-child(2) > span").innerText
             registros.natureza_juridica = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(3) > div:nth-child(3) > span:nth-child(2)").innerText
             registros.atividade_principal = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(3) > div:nth-child(4) > span").innerText
-            registros.logradouro = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(3) > div:nth-child(4) > span").innerText
-            registros.numero = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(2) > span").innerText
-            registros.complemento = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(3) > span").innerText
-            registros.cep = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(4) > span").innerText
-            registros.bairro = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(5) > span").innerText
-            registros.municipio = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(6) > span").innerText
-            registros.uf = document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(7) > span").innerText
+           
+            registros.endereco = {
+                logradouro: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div.col-xs-12.col-sm-3 > span").innerText,
+                numero: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(2) > span").innerText,
+                complemento: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(3) > span").innerText,
+                cep: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(4) > span").innerText,
+                bairro: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(5) > span").innerText,
+                municipio: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(6) > span").innerText,
+                uf: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(7) > span").innerText
+            }
 
+            // if (await page.$('#btnAbaQuadroSocietario') !== null) {
+            //     regis
+            // }
+            
             return registros
         })
 
