@@ -10,10 +10,10 @@ app.listen(port, function () {
 
 
 //'56679863000787'
-const chromeOptions = {
-    headless: false,
-    defaultViewport: null
-};
+// const chromeOptions = {
+//     headless: false,
+//     defaultViewport: null
+// };
 
 
 
@@ -33,7 +33,7 @@ app.get('/', async (req, res) => {
 
 let scrape = async (cnpj) => {
     try {
-        const browser = await puppeter.launch(chromeOptions)
+        const browser = await puppeter.launch({args: ['--no-sandbox']})
         const page = await browser.newPage()
         await page.goto(url, { waitUntil: 'networkidle2' })
 
