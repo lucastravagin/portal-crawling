@@ -19,12 +19,13 @@ app.get('/', async (req, res) => {
         var cnpj = req.query.cnpj
         const url = `http://www.portaltransparencia.gov.br/busca/pessoa-juridica/${cnpj}`
         await scrape(url).then((value)=>{
-            if (value == undefined) res.status(404).send({Erro: 'CNPJ não encontrado no portal da transparência'})
-            res.status(200).send(value)
+            //if (value == undefined) res.status(404).send({Erro: 'CNPJ não encontrado no portal da transparência'})
+            res.status(200).json(value)
         })
         
     } catch (error) {
-        res.status(404).send({Erro: 'CNPJ não encontrado no portal da transparência'})
+        console.log(error)
+        res.status(404).json({Erro: 'CNPJ não encontrado no portal da transparência'})
     }
 
 })
@@ -59,16 +60,61 @@ let scrape = async (url) => {
                 municipio: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(6) > span").innerText,
                 uf: document.querySelector("body > main > div:nth-child(3) > section.dados-tabelados > div:nth-child(5) > div:nth-child(7) > span").innerText
             }
-
-            // if (await page.$('#btnAbaQuadroSocietario') !== null) {
-            //     regis
-            // }
             
             return registros
         })
 
+
+        const seletor = '#collapse-6 > div > table > tbody > tr'
+
+
+        const socios = await page.$$eval(seletor, trs => trs.map(tr => {
+            var objSocio = {}
+            const tds = [...tr.getElementsByTagName('td')]
+            objSocio.nome = tds[0].innerHTML.replace(/\n/gi, " ").trim()
+            objSocio.cargo = tds[1].innerHTML.replace(/\n/gi, " ").trim()
+            return objSocio
+        }))
+
+        
+        const recursos_recebidos = await page.evaluate(() => {
+            const element = document.getElementById('valoresRecebidos')
+            if(element) return element.textContent.trim().substring(19).trim().replace(':'," ") 
+            return ''
+        })
+
+        const produtos_servicos_fornecidos = await page.evaluate(() => {
+            obj_produtos = {}
+            const element = document.getElementById('btnAbaProdutosEServicos')
+            if(element) {
+                obj_produtos.bens_patrimoniais = document.querySelector("#collapse-produtos-e-servicos > div.box-ficha__resultados > div:nth-child(1) > div:nth-child(1) > div > span").innerText
+                obj_produtos.obras = document.querySelector("#collapse-produtos-e-servicos > div.box-ficha__resultados > div:nth-child(2) > div:nth-child(1) > div > span").innerText
+                obj_produtos.outros = document.querySelector("#collapse-produtos-e-servicos > div.box-ficha__resultados > div:nth-child(3) > div:nth-child(1) > div > span").innerText
+                obj_produtos.servicos = document.querySelector("#collapse-produtos-e-servicos > div.box-ficha__resultados > div:nth-child(1) > div:nth-child(2) > div > span").innerText
+                obj_produtos.materiais = document.querySelector("#collapse-produtos-e-servicos > div.box-ficha__resultados > div:nth-child(2) > div:nth-child(2) > div > span").innerText
+                return obj_produtos
+            } else {
+                return ''
+            }
+        })
+
+        const seletor2 = '#listaParticipanteLicitacao > tbody > tr'
+
+        const licitacoes = await page.$$eval(seletor2, trs => trs.map(tr => {
+            var objLicitacoes = {}
+            const tds = [...tr.getElementsByTagName('td')]
+            objLicitacoes.orgao = tds[1].textContent.replace(/\n/gi, " ").trim()
+            objLicitacoes.unidade_gestora_responsavel = tds[2].textContent.trim()
+            objLicitacoes.numero_licitacao = tds[3].textContent.trim()
+            objLicitacoes.data_abertura = tds[4].textContent.trim()
+            return objLicitacoes
+        }))
+         
         browser.close()
-        return result
+        let resultadoFinal = Object.assign(result, {socios})
+        
+        return Object.assign(resultadoFinal, {recursos_recebidos: recursos_recebidos}, 
+            {produtos_servicos_fornecidos: produtos_servicos_fornecidos}, {licitacoes: licitacoes})
     } catch (error) {
         console.log(error)
     }
